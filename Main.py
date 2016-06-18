@@ -20,6 +20,7 @@ DIRECTION = 1
 
 
 def InitGL(Width, Height):
+    global basePos, b
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glClearDepth(1.0)
     glDepthFunc(GL_LESS)
@@ -30,69 +31,56 @@ def InitGL(Width, Height):
     gluPerspective(90.0, float(Width) / float(Height), 0.1, 100.0)
     glMatrixMode(GL_MODELVIEW)
 
+    b = BeeldVerwerking()
+    basePos = [
+        [1.5,1.0,1.0, 1.0],
+        [1.5,-1.0,1.0, 1.0],
+        [1.5,-1.0,-1.0, 1.0],
+        [1.5,1.0,-1.0, 1.0],
+        [-1.5, 1.0, 1.0, 1.0],
+        [-1.5, -1.0, 1.0, 1.0],
+        [-1.5, -1.0, -1.0, 1.0],
+        [-1.5, 1.0, -1.0, 1.0]
+    ]
 
 def keyPressed(*args):
     if args[0] == ESCAPE:
         sys.exit()
 
-
 def DrawGLScene():
-    global X_AXIS, Y_AXIS, Z_AXIS
+    global X_AXIS, Y_AXIS, Z_AXIS, basePos, b
     global DIRECTION
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     glLoadIdentity()
     glTranslatef(0.0, 0.0, -10.0)
+    # glRotate(Z_AXIS,0.5,2.0,1.0)
 
-    glRotatef(Z_AXIS, 0.0, 1.0, 1.0)
-
-    # Draw Cube (multiple quads)
-
+    pos = b.calcAll(basePos, 0, 0, Z_AXIS, [5, 2, -5])
+    # pos = basePos
+    print basePos
+    print pos,  "\n"
     glBegin(GL_QUADS)
 
-    glColor3f(0.0, 1.0, 0.0)
-    glVertex3f(1.0, 1.0, -1.5)
-    glVertex3f(-1.0, 1.0, -1.5)
-    glVertex3f(-1.0, 1.0, 1.5)
-    glVertex3f(1.0, 1.0, 1.5)
+    for i in range(8):
+        if i == 0:
+            glColor3f(0.5, 1.0, 0.5)
+        elif i == 4:
+            glColor3f(1.0, 0.5, 0.5)
+        glVertex3f(pos[i][0],pos[i][1],pos[i][2])
 
-    glColor3f(1.0, 0.0, 0.0)
-    glVertex3f(1.0, -1.0, 1.5)
-    glVertex3f(-1.0, -1.0, 1.5)
-    glVertex3f(-1.0, -1.0, -1.5)
-    glVertex3f(1.0, -1.0, -1.5)
-
-    glColor3f(0.0, 0.0, 1.0)
-    glVertex3f(1.0, 1.0, 1.5)
-    glVertex3f(-1.0, 1.0, 1.5)
-    glVertex3f(-1.0, -1.0, 1.5)
-    glVertex3f(1.0, -1.0, 1.5)
-
-    glColor3f(1.0, 1.0, 0.0)
-    glVertex3f(1.0, -1.0, -1.5)
-    glVertex3f(-1.0, -1.0, -1.5)
-    glVertex3f(-1.0, 1.0, -1.5)
-    glVertex3f(1.0, 1.0, -1.5)
-
-    glColor3f(0.0, 1.0, 1.0)
-    glVertex3f(-1.0, 1.0, 1.5)
-    glVertex3f(-1.0, 1.0, -1.5)
-    glVertex3f(-1.0, -1.0, -1.5)
-    glVertex3f(-1.0, -1.0, 1.5)
-
-    glColor3f(1.0, 0.0, 1.0)
-    glVertex3f(1.0, 1.0, -1.5)
-    glVertex3f(1.0, 1.0, 1.5)
-    glVertex3f(1.0, -1.0, 1.5)
-    glVertex3f(1.0, -1.0, -1.5)
+    for i in range(4):
+        glColor3f(0.0, 1.0, i/4.0)
+        glVertex3f(pos[i][0], pos[i][1], pos[i][2])
+        glVertex3f(pos[(i+1)%4][0], pos[(i+1)%4][1], pos[(i+1)%4][2])
+        glVertex3f(pos[(i+1)%4+4][0], pos[(i+1)%4+4][1], pos[(i+1)%4+4][2])
+        glVertex3f(pos[i+4][0], pos[i+4][1], pos[i+4][2])
 
     glEnd()
 
-    Z_AXIS += 0.25
+    Z_AXIS = (Z_AXIS-0.2)%360
 
     glutSwapBuffers()
-
 
 def main():
     global window
@@ -111,6 +99,4 @@ def main():
 
 
 if __name__ == "__main__":
-    b = BeeldVerwerking()
-    b.calcAll([[1,1,1,1],[1,1,1,1]],90,180,0,[2,4,3])
     main()
